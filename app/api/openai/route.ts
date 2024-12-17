@@ -1,15 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requestOpenai } from "../common";
+import { getServerSideConfig } from "../../config/server";
 
 async function makeRequest(req: NextRequest) {
   try {
-    const api = await requestOpenai(req);
-    const res = new NextResponse(api.body);
-    res.headers.set("Content-Type", "application/json");
-    res.headers.set("Cache-Control", "no-cache");
-    return res;
+    const config = getServerSideConfig();
+    const body = await req.json();
+    
+    const response = await fetch(
+      `${config.apiEndpoint}/models/gemini-pro:generateContent?key=${config.apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (e) {
-    console.error("[OpenAI] ", req.body, e);
+    console.error("[Gemini] ", e);
     return NextResponse.json(
       {
         error: true,
