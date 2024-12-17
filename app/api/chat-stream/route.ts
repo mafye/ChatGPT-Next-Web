@@ -1,35 +1,50 @@
 import { createParser } from "eventsource-parser";
 import { NextRequest } from "next/server";
-import { requestOpenai } from "../common";
 
 async function createStream(req: NextRequest) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
-  const res = await requestOpenai(req);
+  const apiKey = req.headers.get("token");
+  const body = await req.json();
 
-  const contentType = res.headers.get("Content-Type") ?? "";
-  if (!contentType.includes("stream")) {
-    const content = await (
-      await res.text()
-    ).replace(/provided:.*. You/, "provided: ***. You");
-    console.log("[Stream] error ", content);
-    return "```json\n" + content + "```";
-  }
+  // 转换消息格式为Gemini格式
+  const messages = body.messages.map((m: any) => ({
+    role: m.role === "user" ? "user" : "model",
+    parts: [{ text: m.content }]
+  }));
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: messages,
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+      }),
+    }
+  );
 
   const stream = new ReadableStream({
     async start(controller) {
       function onParse(event: any) {
         if (event.type === "event") {
           const data = event.data;
-          // https://beta.openai.com/docs/api-reference/completions/create#completions/create-stream
           if (data === "[DONE]") {
             controller.close();
             return;
           }
           try {
             const json = JSON.parse(data);
-            const text = json.choices[0].delta.content;
+            const text = json.candidates[0].content.parts[0].text;
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {
@@ -39,11 +54,12 @@ async function createStream(req: NextRequest) {
       }
 
       const parser = createParser(onParse);
-      for await (const chunk of res.body as any) {
+      for await (const chunk of response.body as any) {
         parser.feed(decoder.decode(chunk, { stream: true }));
       }
     },
   });
+
   return stream;
 }
 

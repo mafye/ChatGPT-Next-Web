@@ -1,20 +1,18 @@
 import { NextRequest } from "next/server";
 
-const OPENAI_URL = "api.openai.com";
+const GEMINI_URL = "generativelanguage.googleapis.com";
 const DEFAULT_PROTOCOL = "https";
 const PROTOCOL = process.env.PROTOCOL ?? DEFAULT_PROTOCOL;
-const BASE_URL = process.env.BASE_URL ?? OPENAI_URL;
+const BASE_URL = process.env.BASE_URL ?? GEMINI_URL;
+const API_VERSION = "v1beta";
 
-export async function requestOpenai(req: NextRequest) {
+export async function requestGemini(req: NextRequest) {
   const apiKey = req.headers.get("token");
-  const openaiPath = req.headers.get("path");
+  const modelPath = "models/gemini-pro:generateContent";
 
-  console.log("[Proxy] ", openaiPath);
-
-  return fetch(`${PROTOCOL}://${BASE_URL}/${openaiPath}`, {
+  return fetch(`${PROTOCOL}://${BASE_URL}/${API_VERSION}/${modelPath}?key=${apiKey}`, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
     },
     method: req.method,
     body: req.body,
