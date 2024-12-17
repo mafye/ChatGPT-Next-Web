@@ -16,7 +16,7 @@ async function createStream(req: NextRequest) {
   }));
 
   const response = await fetch(
-    `${config.apiEndpoint}/models/gemini-pro:streamGenerateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: {

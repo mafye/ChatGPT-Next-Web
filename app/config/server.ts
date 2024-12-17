@@ -11,31 +11,25 @@ declare global {
   }
 }
 
-const ACCESS_CODES = (function getAccessCodes(): Set<string> {
-  const code = process.env.CODE;
+interface ServerConfig {
+  apiModel: string;
+  apiEndpoint: string;
+  apiKey: string | undefined;
+  code: string | undefined;
+  codes: Set<string>;
+  needCode: boolean;
+  proxyUrl: string | undefined;
+  isVercel: boolean;
+}
 
-  try {
-    const codes = (code?.split(",") ?? [])
-      .filter((v) => !!v)
-      .map((v) => md5.hash(v.trim()));
-    return new Set(codes);
-  } catch (e) {
-    return new Set();
-  }
-})();
-
-export const getServerSideConfig = () => {
-  if (typeof process === "undefined") {
-    throw Error(
-      "[Server Config] you are importing a nodejs-only module outside of nodejs",
-    );
-  }
-
+export const getServerSideConfig = (): ServerConfig => {
   return {
-    apiKey: process.env.OPENAI_API_KEY,
+    apiModel: "gemini",
+    apiEndpoint: "https://generativelanguage.googleapis.com/v1beta",
+    apiKey: process.env.GOOGLE_API_KEY,
     code: process.env.CODE,
-    codes: ACCESS_CODES,
-    needCode: ACCESS_CODES.size > 0,
+    codes: new Set<string>(process.env.CODE?.split(",")),
+    needCode: !!process.env.CODE,
     proxyUrl: process.env.PROXY_URL,
     isVercel: !!process.env.VERCEL,
   };

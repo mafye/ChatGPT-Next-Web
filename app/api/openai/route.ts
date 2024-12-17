@@ -7,7 +7,7 @@ async function makeRequest(req: NextRequest) {
     const body = await req.json();
     
     const response = await fetch(
-      `${config.apiEndpoint}/models/gemini-pro:generateContent?key=${config.apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${config.apiKey}`,
       {
         method: "POST",
         headers: {
