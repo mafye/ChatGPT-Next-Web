@@ -1,11 +1,12 @@
-import { createParser } from "eventsource-parser";
 import { NextRequest } from "next/server";
+import { getServerSideConfig } from "../../config/server";
 
 async function createStream(req: NextRequest) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
-
-  const apiKey = req.headers.get("token");
+  const config = getServerSideConfig();
+  
+  const apiKey = config.apiKey;
   const body = await req.json();
 
   // 转换消息格式为Gemini格式
@@ -15,7 +16,7 @@ async function createStream(req: NextRequest) {
   }));
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:streamGenerateContent?key=${apiKey}`,
+    `${config.apiEndpoint}/models/gemini-pro:streamGenerateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: {
@@ -33,29 +34,37 @@ async function createStream(req: NextRequest) {
     }
   );
 
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(JSON.stringify(error));
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
-      function onParse(event: any) {
-        if (event.type === "event") {
-          const data = event.data;
-          if (data === "[DONE]") {
-            controller.close();
-            return;
-          }
-          try {
-            const json = JSON.parse(data);
-            const text = json.candidates[0].content.parts[0].text;
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
+      try {
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("No reader available");
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.trim()) {
+              const json = JSON.parse(line);
+              if (json.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const text = json.candidates[0].content.parts[0].text;
+                controller.enqueue(encoder.encode(text));
+              }
+            }
           }
         }
-      }
-
-      const parser = createParser(onParse);
-      for await (const chunk of response.body as any) {
-        parser.feed(decoder.decode(chunk, { stream: true }));
+        controller.close();
+      } catch (e) {
+        controller.error(e);
       }
     },
   });
@@ -70,11 +79,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[Chat Stream]", error);
     return new Response(
-      ["```json\n", JSON.stringify(error, null, "  "), "\n```"].join(""),
+      JSON.stringify({ error: error.message }),
+      { status: 500 }
     );
   }
 }
 
 export const config = {
   runtime: "edge",
-};
+}; 
