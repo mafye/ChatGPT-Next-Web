@@ -49,7 +49,7 @@ const ar: PartialLocaleType = {
       Stop: "إيقاف",
       Retry: "إعادة المحاولة",
       Pin: "تثبيت",
-      PinToastContent: "تم تثبيت 1 محا��ثة في الإشعارات المسبقة",
+      PinToastContent: "تم تثبيت 1 محادثة في الإشعارات المسبقة",
       PinToastAction: "عرض",
       Delete: "حذف",
       Edit: "تحرير",
@@ -126,7 +126,7 @@ const ar: PartialLocaleType = {
   },
   Memory: {
     Title: "ملخص التاريخ",
-    EmptyContent: "محتوى المحادثة ��صير جداً، لا حاجة للتلخيص",
+    EmptyContent: "محتوى المحادثة قصير جداً، لا حاجة للتلخيص",
     Send: "ضغط تلقائي لسجل الدردشة كـ سياق",
     Copy: "نسخ الملخص",
     Reset: "[غير مستخدم]",
@@ -502,7 +502,7 @@ const ar: PartialLocaleType = {
       NoData: "لا توجد بيانات",
       Loading: "جارٍ التحميل",
 
-      SubTitle: (count: number) => `تم العثور على ${count} ن��ائج`,
+      SubTitle: (count: number) => `تم العثور على ${count} نتائج`,
     },
     Item: {
       View: "عرض",

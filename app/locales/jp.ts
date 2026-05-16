@@ -103,7 +103,7 @@ const jp: PartialLocaleType = {
     MessageFromChatGPT: "ChatGPT",
     Format: {
       Title: "エクスポート形式",
-      SubTitle: "MarkdownテキストまたはPNG���像としてエクスポートできます",
+      SubTitle: "MarkdownテキストまたはPNG画像としてエクスポートできます",
     },
     IncludeContext: {
       Title: "マスクコンテキストを含む",

@@ -93,7 +93,7 @@ For enterprise inquiries, please contact: **business@nextchat.dev**
 
 <div align="center">
    
-![主���面](./docs/images/cover.png)
+![主界面](./docs/images/cover.png)
 
 </div>
 

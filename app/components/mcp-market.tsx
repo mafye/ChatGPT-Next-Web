@@ -241,7 +241,7 @@ export function McpMarketPage() {
     }
   };
 
-  // 更新加载状态���辅助函数
+  // 更新加载状态的辅助函数
   const updateLoadingState = (id: string, message: string | null) => {
     setLoadingStates((prev) => {
       if (message === null) {

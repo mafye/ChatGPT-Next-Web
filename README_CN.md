@@ -59,7 +59,7 @@
 
 - 删除掉原先的仓库；
 - 使用页面右上角的 fork 按钮，fork 本项目；
-- 在 Vercel 重新选择并部署，[请查看详细教程](./docs/vercel-cn.md#如何���建项目)。
+- 在 Vercel 重新选择并部署，[请查看详细教程](./docs/vercel-cn.md#如何新建项目)。
 
 ### 打开自动更新
 
@@ -242,7 +242,7 @@ DeepSeek Api Url.
 
 在Azure的模式下，支持使用`modelName@Azure=deploymentName`的方式配置模型名称和部署名称(deploy-name)
 
-> 示例：`+gpt-3.5-turbo@Azure=gpt35`这个配置会在模���列表显示一个`gpt35(Azure)`的选项。
+> 示例：`+gpt-3.5-turbo@Azure=gpt35`这个配置会在模型列表显示一个`gpt35(Azure)`的选项。
 > 如果你只能使用Azure模式，那么设置 `-all,+gpt-3.5-turbo@Azure=gpt35` 则可以让对话的默认使用 `gpt35(Azure)`
 
 在ByteDance的模式下，支持使用`modelName@bytedance=deploymentName`的方式配置模型名称和部署名称(deploy-name)
